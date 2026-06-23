@@ -1,9 +1,11 @@
-AXI4 Crossbar Verification Suite
+### AXI4 Crossbar Verification Suite
+
 Project Description: This repository holds the verification framework for a highly performant AXI4 Crossbar Interconnect. The crossbar itself is an adaptable design that allows for concurrent transactions between multiple masters and slaves with the capability to adaptively arbitrate and monitor errors. The verification group worked diligently to validate that the crossbar was reliable, protocol-compliant, and stress tolerant, performing with no deadlocks or protocol errors.
 
 Verification Technique: The verification approach uses a modular agents-based approach for modeling the 4x4 AXI system. Modular Agents: Independent Master drivers and Slave responders for separate channel controls (AW, W, B, AR, and R). Stress Injection: Concentrates on “corner cases” of traffic like starvation floods, matrix congestion, and backpressure. Protocol Validation: Verification of AXI handshake and non-blocking fabric behavior under multi-master accesses.
 <img width="792" height="448" alt="2026-06-23 (1)" src="https://github.com/user-attachments/assets/29f2c86d-5c6b-4b9e-b8c9-39d13df33a6a" />
-Verification Modules Verification of key components:
+### Verification Modules Verification of key components:
+
 AXICB Master Driver (axicb_master_driver.sv)
 This is a SystemVerilog module to create bursts of transactions.
 drive_write_burst(addr, burst_len, master_id) task performs address, data, and response phases of the transaction for testing arbitration and ordering.

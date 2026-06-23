@@ -35,7 +35,7 @@ USER signal support on all AXI channels
 │             ┌───┐                          ┌───┐             │
 │             │ M │                          │ M │             │
 └─────────────┴───┴──────────────────────────┴───┴─────────────┘
-Design Enhancements
+### Design Enhancements
 The following modules were developed and integrated into the crossbar architecture:
 
 axicb_req_logger.sv
@@ -48,11 +48,11 @@ Runtime traffic visibility
 Error detection and monitoring
 Fault recovery through timeouts
 Debugging and performance analysis
-1. Request Logger (axicb_req_logger.sv)
-Motivation
+### 1. Request Logger (axicb_req_logger.sv)
+## Motivation
 The original design lacked visibility into traffic patterns and request distribution among masters.
 
-Implementation
+## Implementation
 The logger passively monitors:
 
 AWVALID && AWREADY
@@ -61,26 +61,26 @@ for each master interface.
 
 Whenever a successful address handshake occurs, the corresponding request counter is incremented.
 
-Outputs
+## Outputs
 req_count[i]
 A monitoring window may be reset using:
 
 window_clear
-Benefits
+## Benefits
 Traffic profiling
 Runtime statistics collection
 Arbitration analysis
 Performance debugging
-2. Response Monitor (axicb_resp_monitor.sv)
-Motivation
+### 2. Response Monitor (axicb_resp_monitor.sv)
+## Motivation
 The original implementation forwarded responses without tracking failures.
 
-Monitored Signals
-Write Response Channel
+### Monitored Signals
+## Write Response Channel
 BVALID
 BREADY
 BRESP
-Read Response Channel
+## Read Response Channel
 RVALID
 RREADY
 RRESP
@@ -89,25 +89,24 @@ Whenever:
 SLVERR (2'b10)
 DECERR (2'b11)
 is detected, an error event is recorded.
-
-Tracked Information
-Write Channel
+### Tracked Information
+## Write Channel
 b_error_count
 b_error_flag
-Read Channel
+## Read Channel
 r_error_count
 r_error_flag
-Benefits
+## Benefits
 Immediate error visibility
 Runtime reliability statistics
 Easier debug and validation
-3. Write Transaction Timeout Support
-Problem
+### 3. Write Transaction Timeout Support
+## Problem
 The original write switch exposed timeout configuration parameters but did not implement timeout recovery.
 
 A stalled slave could indefinitely block write transactions.
 
-Solution
+## Solution
 When a write request is issued:
 
 Start timeout counter

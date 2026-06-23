@@ -112,30 +112,30 @@ When a write request is issued:
 Start timeout counter
 Wait for B-channel response
 Generate timeout response if limit is exceeded
-Generated Response
+## Generated Response
 BRESP = DECERR
-Benefits
+## Benefits
 Deadlock prevention
 Recovery from unresponsive slaves
 Guaranteed forward progress
-4. Read Transaction Timeout Support
-Problem
+### 4. Read Transaction Timeout Support
+## Problem
 Read requests could stall indefinitely if a slave never returned data.
 
-Solution
+## Solution
 When a read request is accepted:
 
 Start timeout counter
 Wait for read response
 Generate synthetic response on timeout
-Generated Response
+## Generated Response
 RRESP = SLVERR
 RLAST = 1
-Benefits
+## Benefits
 Fault tolerance
 Forward progress guarantee
 Improved system robustness
-Adaptive Fairness Arbiter
+### Adaptive Fairness Arbiter
 The original design relies on:
 
 Round-Robin + Static Priority Arbitration
@@ -143,11 +143,11 @@ While fair in most situations, highly active masters can dominate the bus for ex
 
 To improve fairness, an adaptive arbitration mechanism was introduced around the existing round-robin arbiter.
 
-Normal Mode
+### Normal Mode
 Operation remains identical to the original implementation:
 
 Round-Robin + Priority Arbitration
-Fairness Mode
+### Fairness Mode
 The arbiter tracks:
 
 dominance_cnt
@@ -162,18 +162,18 @@ Remaining requesters are granted access until:
 served_mask == requester_mask
 After all waiting masters are serviced, normal arbitration resumes.
 
-Key Signals
+## Key Signals
 dominance_cnt
 dominant_master
 
 fairness_mode
 blocked_master
 served_mask
-Advantages
+## Advantages
 Reduced starvation risk
 Improved fairness
 Better behavior under asymmetric traffic
-Integration
+### Integration
 Data Flow
 Master Requests
       │
@@ -196,13 +196,13 @@ Response Monitor
 Master Interfaces
 The logger provides traffic statistics, the arbiter manages fairness, and the response monitor tracks transaction failures and timeout-generated errors.
 
-Verification Framework
+### Verification Framework
 A complete SystemVerilog-based verification environment was developed to validate functionality, protocol compliance, fairness mechanisms, timeout recovery, and system robustness.
 
 The verification environment models a 4×4 AXI system using independent master and slave agents.
 
-Verification Methodology
-Modular Agents
+## Verification Methodology
+## Modular Agents
 Independent channel-level drivers and responders for:
 
 AW Channel
@@ -210,7 +210,7 @@ W Channel
 B Channel
 AR Channel
 R Channel
-Stress Testing
+## Stress Testing
 The environment focuses on corner-case traffic patterns including:
 
 Starvation floods
@@ -218,7 +218,7 @@ Matrix congestion
 Slave backpressure
 Arbitration stress
 Timeout scenarios
-Protocol Validation
+## Protocol Validation
 The framework validates:
 
 AXI handshakes
@@ -226,8 +226,8 @@ Ordering behavior
 Non-blocking operation
 Response correctness
 Fair arbitration
-Verification Components
-AXICB Master Driver (axicb_master_driver.sv)
+### Verification Components
+### AXICB Master Driver (axicb_master_driver.sv)
 Generates AXI burst transactions.
 
 Example task:
@@ -239,127 +239,127 @@ Burst handling
 Arbitration
 Ordering
 Routing correctness
-Adaptive Arbiter Monitor
+## Adaptive Arbiter Monitor
 Validates:
 
 Dominance detection
 Fairness-mode activation
 Fairness-mode exit
 Dynamic arbitration behavior
-AXI Response Monitor
+## AXI Response Monitor
 Checks:
 
 SLVERR
 DECERR
 responses and validates error tracking logic.
 
-Timeout Detector
+## Timeout Detector
 Monitors:
 
 Read timeout counters
 Write timeout counters
 Correct timeout response generation
-Verification Scenarios
-1. Starvation Flood
-Objective
+### Verification Scenarios
+## 1. Starvation Flood
+## Objective
 Validate fairness under extreme priority imbalance.
 
-Procedure
+## Procedure
 High-priority masters continuously generate traffic.
 Lower-priority masters issue requests simultaneously.
-Expected Result
+## Expected Result
 Fairness mode activates.
 Dominant master is temporarily blocked.
 Waiting masters complete transactions.
 No starvation occurs.
-2. Matrix Congestion
-Objective
+## 2. Matrix Congestion
+## Objective
 Validate non-blocking fabric behavior.
 
-Procedure
+## Procedure
 All masters communicate with all slaves simultaneously.
 
-Expected Result
+## Expected Result
 No deadlocks
 Correct routing
 No data corruption
 Sustained throughput
-3. Slave Backpressure
-Objective
+### 3. Slave Backpressure
+## Objective
 Validate pipeline stall propagation.
 
-Procedure
+## Procedure
 Slave response latency is artificially increased (up to 6 cycles).
 
-Expected Result
+## Expected Result
 READY signals deassert correctly
 Backpressure propagates upstream
 No protocol violations occur
-4. Write Timeout Validation
-Procedure
+### 4. Write Timeout Validation
+## Procedure
 Slave intentionally suppresses BVALID.
 Timeout counter expires.
-Expected Result
+## Expected Result
 BRESP = DECERR
 generated automatically.
 
-5. Read Timeout Validation
-Procedure
+### 5. Read Timeout Validation
+## Procedure
 Slave intentionally suppresses RVALID.
 Timeout counter expires.
-Expected Result
+## Expected Result
 RRESP = SLVERR
 RLAST = 1
 generated automatically.
 
-6. Error Monitoring Validation
-Procedure
+### 6. Error Monitoring Validation
+## Procedure
 Inject:
 
 SLVERR
 DECERR
 responses.
 
-Expected Result
+## Expected Result
 Error counters increment
 Error flags assert
 Monitor correctly records failures
-Waveform Analysis
-Test Case 1 – Starvation & Priority Arbitration
-Observation
+### Waveform Analysis
+### Test Case 1 – Starvation & Priority Arbitration
+### Observation
 Multiple masters issue concurrent write requests.
 
-Result
+### Result
 The arbiter serializes requests correctly and routes transactions to the appropriate slaves, demonstrating proper arbitration and fairness enforcement.
 
-Test Case 2 – Matrix Congestion
-Observation
+### Test Case 2 – Matrix Congestion
+### Observation
 Heavy traffic activity is observed across the write data channels.
 
-Result
+### Result
 The crossbar sustains simultaneous master-to-slave communications without fabric-wide stalls, demonstrating non-blocking behavior and data integrity.
 
-Test Case 3 – Extreme Backpressure
-Observation
+### Test Case 3 – Extreme Backpressure
+### Observation
 Delayed slave responses cause repeated B-channel wait conditions.
 
-Result
+### Result
 Backpressure propagates correctly through the fabric and prevents masters from overwhelming busy slaves.
 
-Verification Results
-Stability
+### Verification Results
+## Stability
 Stable operation at 100% bandwidth saturation
 No protocol violations observed
-Performance
+## Performance
 Successful completion of 16-beat bursts
 Correct operation under highly asymmetric pipeline delays
-Reliability
+## Reliability
 Deadlock-free operation
 Correct timeout recovery
 Accurate error reporting
 Robust arbitration under heavy contention
-Feature Comparison
-Feature	Original Crossbar	Enhanced Crossbar
+### Feature Comparison
+## Feature	Original Crossbar Enhanced Crossbar
 Round-Robin Arbitration	✓	✓
 Static Priority Support	✓	✓
 Adaptive Fairness Arbitration	✗	✓
@@ -370,7 +370,7 @@ Read Timeout Recovery	✗	✓
 Runtime Statistics	✗	✓
 Enhanced Starvation Protection	Limited	✓
 Verification Framework	Basic	Comprehensive
-Impact
+## Impact
 The enhanced AXI4 Crossbar evolves beyond a simple routing fabric into a monitored, fault-aware, fairness-enhanced interconnect suitable for modern SoC environments.
 
 Key improvements include:
